@@ -81,7 +81,7 @@ for batch in range(max_batches):
 
     # save model
     if (batch+1) % 1000 == 0:
-        model_file = "%s/%s.model" % (backup_path, batch+1)
+        model_file = "%s/darknet19_224_%s.model" % (backup_path, batch+1)
         print("saving model to %s" % (model_file))
         serializers.save_hdf5(model_file, model)
         serializers.save_hdf5(backup_file, model)

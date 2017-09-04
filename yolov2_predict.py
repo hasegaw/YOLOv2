@@ -73,6 +73,7 @@ if __name__ == "__main__":
     # argument parse
     parser = argparse.ArgumentParser(description="指定したパスの画像を読み込み、bbox及びクラスの予測を行う")
     parser.add_argument('path', help="画像ファイルへのパスを指定")
+    parser.add_argument('--show', '-s', dest='show', action='store_true', default=False)
     args = parser.parse_args()
     image_file = args.path
 
@@ -95,3 +96,6 @@ if __name__ == "__main__":
         text = '%s(%2d%%)' % (result["label"], result["probs"].max()*result["conf"]*100)
         cv2.putText(orig_img, text, (left, top-6), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
         print(text)
+    if args.show:
+        cv2.imshow('output', orig_img)
+        cv2.waitKey()

@@ -163,10 +163,14 @@ class ImageGenerator():
             boxes = []
             for j in range(np.random.randint(n_items)+1):
                 class_id = np.random.randint(len(self.labels))
-                item = self.items[class_id]
-                item = random_rotate_scale_image(item, min_item_scale, max_item_scale, rand_angle)
-
-                tmp_image, bbox = random_overlay_image(sample_image, item, minimum_crop)
+                bbox = None
+                while bbox is None:
+                    item = self.items[class_id]
+                    item = random_rotate_scale_image(item, min_item_scale, max_item_scale, rand_angle)
+                    try:
+                        tmp_image, bbox = random_overlay_image(sample_image, item, minimum_crop)
+                    except:
+                        pass
                 yolo_bbox = yolo_format_bbox(tmp_image, bbox)
                 box = Box(yolo_bbox[0], yolo_bbox[1], yolo_bbox[2], yolo_bbox[3])
                 if maximum_iou(box, boxes) < 0.3:

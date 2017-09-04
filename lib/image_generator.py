@@ -98,8 +98,10 @@ class ImageGenerator():
     def __init__(self, item_path, background_path):
         self.bg_files = glob.glob(background_path + "/*")
         self.item_files = glob.glob(item_path + "/*")
-        self.items = []
-        self.labels = []
+        label_file = "./data/label.txt"
+        with open(label_file, "r") as f:
+            self.labels = f.read().strip().split("\n")
+        self.items = [None] * len(self.labels)
         self.bgs = []
         for item_file in self.item_files:
             image = cv2.imread(item_file, cv2.IMREAD_UNCHANGED)
@@ -108,18 +110,21 @@ class ImageGenerator():
             y = int(center - image.shape[0]/2)
             x = int(center - image.shape[1]/2)
             pixels[y:y+image.shape[0], x:x+image.shape[1], :] = image
-            self.items.append(pixels.astype(np.uint8))
-            self.labels.append(item_file.split("/")[-1].split(".")[0])
+            class_id_string = item_file.split("/")[-1].split(".")[0]
+            class_id = self.labels.index(class_id_string)
+            self.items[class_id] = pixels.astype(np.uint8)
 
         for bg_file in self.bg_files:
             self.bgs.append(cv2.imread(bg_file))
+
+        # None check
+        assert len(list(filter(lambda x:x is None, self.items))) == 0
 
     def generate_random_animation(self, loop, bg_index, crop_width, crop_height, min_item_scale, max_item_scale):
         frames = []
         sampled_background = random_sampling(self.bgs[bg_index], crop_height, crop_width)
         bg_height, bg_width, _ = sampled_background.shape
         for i in range(loop):
-            #class_id = np.random.randint(len(self.labels))
             class_id = i % len(self.labels)
             item = self.items[class_id]
             item = scale_image(item, min_item_scale + np.random.rand() * (max_item_scale-min_item_scale))

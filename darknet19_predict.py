@@ -9,11 +9,11 @@ from darknet19 import *
 # argument parse
 parser = argparse.ArgumentParser(description="指定したパスの画像を読み込み、darknet19でカテゴリ分類を行う")
 parser.add_argument('path', help="クラス分類する画像へのパスを指定")
+parser.add_argument('--model', '-m', dest='model', type=str, help='model file. ', default='./backup/darknet19_final.model')
 args = parser.parse_args()
 
 # hyper parameters
 input_height, input_width = (224, 224)
-weight_file = "./backup/darknet19_final.model"
 label_file = "./data/label.txt"
 image_file = args.path
 
@@ -31,7 +31,7 @@ img = img.transpose(2, 0, 1)
 # load model
 print("loading model...")
 model = Darknet19Predictor(Darknet19())
-serializers.load_hdf5(weight_file, model) # load saved model
+serializers.load_hdf5(args.model, model) # load saved model
 model.predictor.train = False
 
 # forward
